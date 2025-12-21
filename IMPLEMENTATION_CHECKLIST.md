@@ -15,7 +15,7 @@ This checklist outlines the sequential steps to implement the Android CRUD appli
 
 ## Phase 2: Data Layer (Room & Repository)
 - [x] **Define Data Model:**
-    - Create `EntryEntity.kt` with `id`, `timestamp` (Long), and `entryValue` (Int).
+    - Create `EntryEntity.kt` with `id`, `timestamp` (Instant), and `entryValue` (Int).
 - [x] **Implement TypeConverters:**
     - Create `Converters.kt` for `Instant` <-> `Long` (epoch millis) conversion.
 - [x] **Create DAO:**
