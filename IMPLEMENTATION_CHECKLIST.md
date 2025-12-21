@@ -60,14 +60,14 @@ This checklist outlines the sequential steps to implement the Android CRUD appli
     - [x] Connect the trash can button click to the delete functionality in `HomeViewModel`.
 
 ## Phase 7: Edit Entry Feature
-- [ ] **Update Data Layer:**
+- [x] **Update Data Layer:**
     - Add `updateEntry` method to `EntryDao` and `EntryRepository`.
-- [ ] **Edit Navigation:**
+- [x] **Edit Navigation:**
     - Update `AddEntryDestination` to accept an optional `entryId` argument.
-- [ ] **Edit Mode in ViewModel:**
+- [x] **Edit Mode in ViewModel:**
     - Update `AddEntryViewModel` to load existing entry data if `entryId` is present.
     - Support updating existing entries in the database.
-- [ ] **Home Screen UI:**
+- [x] **Home Screen UI:**
     - Add a Pencil icon button to the right side of each entry row in `HomeScreen`.
     - Implement navigation to the edit screen upon clicking the pencil icon.
 

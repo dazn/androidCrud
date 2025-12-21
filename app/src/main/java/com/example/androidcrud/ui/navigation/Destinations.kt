@@ -6,4 +6,4 @@ import kotlinx.serialization.Serializable
 object HomeDestination
 
 @Serializable
-object AddEntryDestination
+data class AddEntryDestination(val entryId: Long? = null)

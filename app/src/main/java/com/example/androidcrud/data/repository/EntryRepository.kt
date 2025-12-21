@@ -22,6 +22,14 @@ class EntryRepository @Inject constructor(
         }
     }
 
+    suspend fun updateEntry(entry: EntryEntity) {
+        if (entry.entryValue > 0) {
+            entryDao.updateEntry(entry)
+        } else {
+            throw IllegalArgumentException("entryValue must be a positive integer")
+        }
+    }
+
     suspend fun deleteEntry(entry: EntryEntity) {
         entryDao.deleteEntry(entry)
     }

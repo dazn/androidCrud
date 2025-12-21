@@ -18,7 +18,10 @@ fun AppNavigation() {
         composable<HomeDestination> {
             HomeScreen(
                 onAddEntryClick = {
-                    navController.navigate(AddEntryDestination)
+                    navController.navigate(AddEntryDestination(entryId = null))
+                },
+                onEditEntryClick = { entryId ->
+                    navController.navigate(AddEntryDestination(entryId = entryId))
                 }
             )
         }

@@ -3,8 +3,10 @@ package com.example.androidcrud.ui.screens.add
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.example.androidcrud.data.local.EntryEntity
 import com.example.androidcrud.data.repository.EntryRepository
+import com.example.androidcrud.ui.navigation.AddEntryDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,11 +30,32 @@ class AddEntryViewModel @Inject constructor(
     private val entryRepository: EntryRepository
 ) : ViewModel() {
 
+    private val entryId: Long? = savedStateHandle.toRoute<AddEntryDestination>().entryId
+
     private val _uiState = MutableStateFlow(AddEntryUiState(
         entryValueInput = savedStateHandle["entryValueInput"] ?: "",
         selectedTimestamp = savedStateHandle["selectedTimestamp"] ?: Instant.now()
     ))
     val uiState: StateFlow<AddEntryUiState> = _uiState.asStateFlow()
+
+    init {
+        if (entryId != null && !savedStateHandle.contains("entryValueInput")) {
+            viewModelScope.launch {
+                val entry = entryRepository.getEntryById(entryId)
+                entry?.let {
+                    savedStateHandle["entryValueInput"] = it.entryValue.toString()
+                    savedStateHandle["selectedTimestamp"] = it.timestamp
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            entryValueInput = it.entryValue.toString(),
+                            selectedTimestamp = it.timestamp,
+                            entryValueInt = it.entryValue
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     fun updateEntryValue(input: String) {
         savedStateHandle["entryValueInput"] = input
@@ -59,12 +82,17 @@ class AddEntryViewModel @Inject constructor(
         if (value != null && value > 0) {
             viewModelScope.launch {
                 try {
-                    entryRepository.insertEntry(
-                        EntryEntity(
-                            timestamp = currentState.selectedTimestamp,
-                            entryValue = value
-                        )
+                    val entry = EntryEntity(
+                        id = entryId ?: 0L,
+                        timestamp = currentState.selectedTimestamp,
+                        entryValue = value
                     )
+                    
+                    if (entryId != null) {
+                        entryRepository.updateEntry(entry)
+                    } else {
+                        entryRepository.insertEntry(entry)
+                    }
                     _uiState.update { it.copy(isEntrySaved = true) }
                 } catch (e: Exception) {
                     // Handle error if needed

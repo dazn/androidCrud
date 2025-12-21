@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,8 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.androidcrud.data.local.EntryEntity
-import com.example.androidcrud.ui.screens.home.HomeUiState
-import com.example.androidcrud.ui.screens.home.HomeViewModel
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -26,6 +25,7 @@ import java.time.format.FormatStyle
 @Composable
 fun HomeScreen(
     onAddEntryClick: () -> Unit,
+    onEditEntryClick: (Long) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -59,7 +59,8 @@ fun HomeScreen(
                 is HomeUiState.Success -> {
                     EntryList(
                         entries = state.entries,
-                        onDelete = viewModel::deleteEntry
+                        onDelete = viewModel::deleteEntry,
+                        onEdit = onEditEntryClick
                     )
                 }
             }
@@ -71,7 +72,8 @@ fun HomeScreen(
 @Composable
 fun EntryList(
     entries: List<EntryEntity>,
-    onDelete: (EntryEntity) -> Unit
+    onDelete: (EntryEntity) -> Unit,
+    onEdit: (Long) -> Unit
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(
@@ -117,7 +119,8 @@ fun EntryList(
             ) {
                  EntryItem(
                      entry = entry,
-                     onDeleteClick = { onDelete(entry) }
+                     onDeleteClick = { onDelete(entry) },
+                     onEditClick = { onEdit(entry.id) }
                  )
             }
         }
@@ -127,7 +130,8 @@ fun EntryList(
 @Composable
 fun EntryItem(
     entry: EntryEntity,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit
 ) {
     val formatter = remember {
         DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
@@ -138,11 +142,19 @@ fun EntryItem(
         headlineContent = { Text(text = "Value: ${entry.entryValue}") },
         supportingContent = { Text(text = formatter.format(entry.timestamp)) },
         trailingContent = {
-            IconButton(onClick = onDeleteClick) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete Entry"
-                )
+            Row {
+                IconButton(onClick = onEditClick) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Entry"
+                    )
+                }
+                IconButton(onClick = onDeleteClick) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Entry"
+                    )
+                }
             }
         }
     )
