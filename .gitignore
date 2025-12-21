@@ -1,2 +1,4 @@
 .worktrees/
 .aider*
+app/build*
+build*
