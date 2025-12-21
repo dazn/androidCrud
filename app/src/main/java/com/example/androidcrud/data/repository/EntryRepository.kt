@@ -33,4 +33,8 @@ class EntryRepository @Inject constructor(
     suspend fun deleteEntry(entry: EntryEntity) {
         entryDao.deleteEntry(entry)
     }
+
+    suspend fun replaceAllEntries(entries: List<EntryEntity>) {
+        entryDao.replaceAll(entries)
+    }
 }

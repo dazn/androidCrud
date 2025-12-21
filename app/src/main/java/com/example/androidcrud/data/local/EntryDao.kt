@@ -19,9 +19,21 @@ interface EntryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntry(entry: EntryEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(entries: List<EntryEntity>)
+
     @Update
     suspend fun updateEntry(entry: EntryEntity)
 
     @Delete
     suspend fun deleteEntry(entry: EntryEntity)
+
+    @Query("DELETE FROM entries")
+    suspend fun deleteAll()
+
+    @androidx.room.Transaction
+    suspend fun replaceAll(entries: List<EntryEntity>) {
+        deleteAll()
+        insertAll(entries)
+    }
 }
