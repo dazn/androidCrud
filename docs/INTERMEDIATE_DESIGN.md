@@ -2,12 +2,12 @@
 
 ## Overview
 
-This document represents the current architectural state of the Android CRUD application. It evolves the `INITIAL_DESIGN.md` by incorporating features and changes implemented during Phases 1 through 7 of the `IMPLEMENTATION_CHECKLIST.md`, specifically the addition of **Edit** and **Delete** capabilities, and the refinement of the **Add** flow.
+This document represents the current architectural state of the Android CRUD application. It evolves the `INITIAL_DESIGN.md` by incorporating features and changes implemented during Phases 1 through 8 of the `IMPLEMENTATION_CHECKLIST.md`, including full CRUD capabilities, UI polishing, and comprehensive testing.
 
 ## Current Project Status
 
-- **Phases Completed:** 1 through 7 (Setup, Data Layer, Navigation, Add, Home, Delete, Edit).
-- **Current Focus:** Phase 8 (UI Polish and Verification/Testing).
+- **Phases Completed:** 1 through 8 (Setup, Data Layer, Navigation, Add, Home, Delete, Edit, Polish & Testing).
+- **Current Focus:** Maintenance, optimization, and potential new features.
 
 ## Requirements & Features
 
@@ -17,11 +17,19 @@ This document represents the current architectural state of the Android CRUD app
     - `entryValue`: Positive integer.
 - **CRUD Operations:**
     - **Create:** Add new entries with validation.
-    - **Read:** List all entries sorted by database order (currently).
+    - **Read:** List all entries sorted by database order.
     - **Update:** Edit existing entries (value and timestamp).
     - **Delete:** Remove entries via Swipe-to-Dismiss or Trash icon.
+- **UI/UX:**
+    - Material 3 Design with Edge-to-Edge support.
+    - Human-readable timestamp formatting.
+    - Intuitive CRUD interactions (FAB, Swipe, Icon buttons).
+- **Quality Assurance:**
+    - Unit tests for ViewModels and Repositories.
+    - Instrumented E2E tests for core flows.
+    - Robolectric tests for UI logic.
 - **Architecture:** MVVM (Model-View-ViewModel) with Repository pattern.
-- **UI Framework:** Jetpack Compose (Edge-to-Edge).
+- **UI Framework:** Jetpack Compose.
 
 ## Project Structure
 
@@ -122,18 +130,9 @@ data class AddEntryDestination(
 - **Navigation Compose:** Type-Safe Serialization.
 - **Java Time:** `java.time.Instant` for timestamps.
 
-## Remaining Implementation Steps (Phase 8)
+## Verification and Quality
 
-The core functionality is built. The following steps remain to reach the "Definition of Done":
-
-1.  **UI Refinement:**
-    - Improve timestamp formatting in `HomeScreen` (currently raw or basic formatting).
-    - Audit UI against Material 3 standards (padding, typography).
-    - Verify Edge-to-Edge behavior on different screen sizes/orientations.
-2.  **Unit Testing:**
-    - `HomeViewModel`: Test loading, empty states, delete events.
-    - `AddEntryViewModel`: Test validation, save (insert vs update), state restoration.
-    - `EntryRepository`: Test flow emissions and data mapping.
-3.  **Instrumented Testing:**
-    - Robolectric tests for local UI logic verification.
-    - AndroidTest for End-to-End flows (Add -> Verify -> Edit -> Verify -> Delete -> Verify).
+With the completion of Phase 8, the application has undergone:
+1.  **UI Refinement:** Audited for Material 3 standards, proper padding, typography, and edge-to-edge behavior. Timestamps are formatted for readability.
+2.  **Unit Testing:** ViewModels (`HomeViewModel`, `AddEntryViewModel`) and `EntryRepository` are covered by unit tests ensuring logic correctness.
+3.  **Instrumented Testing:** Robolectric and AndroidTest suites verify both UI logic and End-to-End flows (Add -> Verify -> Edit -> Verify -> Delete -> Verify).
