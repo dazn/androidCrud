@@ -72,12 +72,12 @@ This checklist outlines the sequential steps to implement the Android CRUD appli
     - Implement navigation to the edit screen upon clicking the pencil icon.
 
 ## Phase 8: Polish & Verification
-- [ ] **UI Refinement:**
+- [x] **UI Refinement:**
     - Format timestamps for human readability in the list.
     - Ensure Material 3 design consistency and edge-to-edge compliance.
-- [ ] **Unit Testing:**
+- [x] **Unit Testing:**
     - Write tests for `HomeViewModel` and `AddEntryViewModel`.
     - Write tests for `EntryRepository`.
-- [ ] **UI/Instrumented Testing:**
+- [x] **UI/Instrumented Testing:**
     - Create a Robolectric test for UI logic.
     - Create an E2E instrumented test (Start -> Add -> Verify).
