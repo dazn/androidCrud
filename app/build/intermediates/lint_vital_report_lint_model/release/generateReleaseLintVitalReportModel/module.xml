@@ -1,0 +1,19 @@
+<lint-module
+    format="1"
+    dir="/home/dazn/androidCrud/app"
+    name=":app"
+    type="APP"
+    maven="Android Crud:app:unspecified"
+    agpVersion="8.7.3"
+    buildFolder="build"
+    bootClassPath="/home/dazn/Android/Sdk/platforms/android-36/android.jar:/home/dazn/Android/Sdk/build-tools/34.0.0/core-lambda-stubs.jar"
+    javaSourceLevel="11"
+    compileTarget="android-36"
+    neverShrinking="true">
+  <lintOptions
+      abortOnError="true"
+      absolutePaths="true"
+      checkReleaseBuilds="true"
+      explainIssues="true"/>
+  <variant name="release"/>
+</lint-module>
