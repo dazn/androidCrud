@@ -28,29 +28,50 @@ This checklist outlines the sequential steps to implement the Android CRUD appli
     - Create `EntryRepository.kt` to wrap DAO calls and handle basic business logic (e.g., entryValue > 0 validation).
 
 ## Phase 3: Navigation & UI Foundation
-- [ ] **Define Type-Safe Routes:**
+- [x] **Define Type-Safe Routes:**
     - Use `@Serializable` objects/classes for `HomeDestination` and `AddEntryDestination`.
-- [ ] **Implement Navigation Graph:**
+- [x] **Implement Navigation Graph:**
     - Create `AppNavigation.kt` using `NavHost` and `composable` with type-safe arguments.
 
 ## Phase 4: Add Entry Feature
-- [ ] **Add Entry ViewModel:**
+- [x] **Add Entry ViewModel:**
     - Implement `AddEntryViewModel.kt` using `SavedStateHandle`.
     - Define `AddEntryUiState` for entryValue input, date, and validation status.
-- [ ] **Add Entry Screen:**
+- [x] **Add Entry Screen:**
     - Implement `AddEntryScreen.kt` with text fields and validation logic.
     - Handle `WindowInsets` using `Scaffold`.
+- [x] **Timestamp Selection:**
+    - Update `AddEntryViewModel` to support custom timestamp selection.
+    - Implement Date & Time pickers in `AddEntryScreen`.
+    - Format and display the selected timestamp in the UI.
 
 ## Phase 5: Home (List) Feature
-- [ ] **Home ViewModel:**
-    - Implement `HomeViewModel.kt` observing the repository's `Flow`.
-    - Define `HomeUiState` (Loading, Success, Empty, Error).
-- [ ] **Home Screen:**
-    - Implement `HomeScreen.kt` with a `LazyColumn` for entries.
-    - Add a Floating Action Button (FAB) for navigation to "Add Entry".
-    - Implement swipe-to-delete functionality.
+- [x] **Home ViewModel:**
+    - [x] Implement `HomeViewModel.kt` observing the repository's `Flow`.
+    - [x] Define `HomeUiState` (Loading, Success, Empty, Error).
+- [x] **Home Screen:**
+    - [x] Implement `HomeScreen.kt` with a `LazyColumn` for entries.
+    - [x] Add a Floating Action Button (FAB) for navigation to "Add Entry".
+    - [x] Implement swipe-to-delete functionality.
 
-## Phase 6: Polish & Verification
+## Phase 6: Delete Entry Feature
+- [x] **Home Screen UI:**
+    - [x] Add a Trash Can icon button to the right side of each entry row in `HomeScreen`.
+    - [x] Connect the trash can button click to the delete functionality in `HomeViewModel`.
+
+## Phase 7: Edit Entry Feature
+- [ ] **Update Data Layer:**
+    - Add `updateEntry` method to `EntryDao` and `EntryRepository`.
+- [ ] **Edit Navigation:**
+    - Update `AddEntryDestination` to accept an optional `entryId` argument.
+- [ ] **Edit Mode in ViewModel:**
+    - Update `AddEntryViewModel` to load existing entry data if `entryId` is present.
+    - Support updating existing entries in the database.
+- [ ] **Home Screen UI:**
+    - Add a Pencil icon button to the right side of each entry row in `HomeScreen`.
+    - Implement navigation to the edit screen upon clicking the pencil icon.
+
+## Phase 8: Polish & Verification
 - [ ] **UI Refinement:**
     - Format timestamps for human readability in the list.
     - Ensure Material 3 design consistency and edge-to-edge compliance.

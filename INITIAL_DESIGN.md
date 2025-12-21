@@ -5,9 +5,9 @@ A simple Android CRUD application for logging entries with a timestamp and a pos
 ## Requirements
 
 - **Data Model:** Entries containing two fields:
-  - Date/time (timestamp)
+  - Date/time (timestamp) - User selectable during creation.
   - entryValue (positive integer)
-- **Primary Use Case:** Quick entry creation (logging/tracking)
+- **Primary Use Case:** Quick entry creation (logging/tracking) with historical entry support.
 - **Storage:** Local SQLite database using Room
 - **UI Framework:** Jetpack Compose (Edge-to-Edge)
 - **Architecture:** MVVM (Model-View-ViewModel) with Repository pattern
@@ -133,17 +133,18 @@ UI consumes state using **`collectAsStateWithLifecycle()`** to ensure flow colle
 
 #### Add Entry
 - **ViewModel:** `AddEntryViewModel`
-    - Uses `SavedStateHandle` to preserve input (entryValue value) across process death.
+    - Uses `SavedStateHandle` to preserve input (entryValue value and selected timestamp) across process death.
 - **State:** `AddEntryUiState`
   ```kotlin
   data class AddEntryUiState(
       val entryValueInput: String = "",
-      val date: Instant = Instant.now(),
-      val isValid: Boolean = false,
-      val isSaved: Boolean = false
+      val selectedTimestamp: Instant = Instant.now(),
+      val entryValueInt: Int? = null,
+      val entryValueError: Boolean = false,
+      val isEntrySaved: Boolean = false
   )
   ```
-- **Events:** `updateEntryValue(String)`, `updateDate(Instant)`, `saveEntry()`
+- **Events:** `updateEntryValue(String)`, `updateTimestamp(Instant)`, `saveEntry()`
 
 ### Navigation
 Uses **Type-Safe Navigation** (Compose Navigation 2.8.0+).
