@@ -268,7 +268,8 @@ fun EntryItem(
                 IconButton(onClick = onDeleteClick) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete Entry"
+                        contentDescription = "Delete Entry",
+                        tint = Color.Red
                     )
                 }
             }
