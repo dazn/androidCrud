@@ -44,6 +44,10 @@ fun HomeScreen(
     var showImportConfirmationDialog by remember { mutableStateOf(false) }
     var pendingImportUri by remember { mutableStateOf<Uri?>(null) }
     
+    // State for Delete Confirmation
+    var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
+    var entryToDelete by remember { mutableStateOf<EntryEntity?>(null) }
+    
     // Launchers
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -102,6 +106,48 @@ fun HomeScreen(
                     onClick = {
                         showImportConfirmationDialog = false
                         pendingImportUri = null
+                    }
+                ) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+
+    if (showDeleteConfirmationDialog && entryToDelete != null) {
+        val entry = entryToDelete!!
+        val formatter = remember {
+            DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+                .withZone(ZoneId.systemDefault())
+        }
+        val dateString = formatter.format(entry.timestamp)
+
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteConfirmationDialog = false
+                entryToDelete = null
+            },
+            title = { Text(stringResource(R.string.delete_dialog_title)) },
+            text = { Text(stringResource(R.string.delete_dialog_message, dateString)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteEntry(entry)
+                        showDeleteConfirmationDialog = false
+                        entryToDelete = null
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.action_delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteConfirmationDialog = false
+                        entryToDelete = null
                     }
                 ) {
                     Text(stringResource(R.string.action_cancel))
@@ -175,7 +221,10 @@ fun HomeScreen(
                 is HomeUiState.Success -> {
                     EntryList(
                         entries = state.entries,
-                        onDelete = viewModel::deleteEntry,
+                        onDelete = { entry ->
+                            entryToDelete = entry
+                            showDeleteConfirmationDialog = true
+                        },
                         onEdit = onEditEntryClick
                     )
                 }

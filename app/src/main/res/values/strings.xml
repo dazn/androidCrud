@@ -11,4 +11,7 @@
     <string name="import_dialog_message">Restoration from backup file replaces all existing data. All existing data will be lost!</string>
     <string name="action_continue">Continue</string>
     <string name="action_cancel">Cancel</string>
+    <string name="delete_dialog_title">Confirm Deletion</string>
+    <string name="delete_dialog_message">Are you sure you want to delete the entry from %s?</string>
+    <string name="action_delete">Delete</string>
 </resources>
