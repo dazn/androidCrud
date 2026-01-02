@@ -14,6 +14,14 @@ open class EntryRepository @Inject constructor(
 
     open suspend fun getEntryById(id: Long): EntryEntity? = entryDao.getEntryById(id)
 
+    open suspend fun saveEntry(entry: EntryEntity) {
+        if (entry.id == 0L) {
+            insertEntry(entry)
+        } else {
+            updateEntry(entry)
+        }
+    }
+
     open suspend fun insertEntry(entry: EntryEntity) {
         if (entry.entryValue > 0) {
             entryDao.insertEntry(entry)
