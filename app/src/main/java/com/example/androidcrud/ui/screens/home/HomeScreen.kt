@@ -1,5 +1,8 @@
 package com.example.androidcrud.ui.screens.home
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,19 +12,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.androidcrud.R
 import com.example.androidcrud.data.local.EntryEntity
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onAddEntryClick: () -> Unit,
@@ -29,8 +36,113 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val importExportState by viewModel.importExportState.collectAsStateWithLifecycle()
+    
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // State for Import Confirmation
+    var showImportConfirmationDialog by remember { mutableStateOf(false) }
+    var pendingImportUri by remember { mutableStateOf<Uri?>(null) }
+    
+    // Launchers
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        uri?.let { viewModel.exportData(it) }
+    }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            pendingImportUri = it
+            showImportConfirmationDialog = true
+        }
+    }
+
+    // Effect for Import/Export State
+    LaunchedEffect(importExportState) {
+        when (val state = importExportState) {
+            is ImportExportState.Success -> {
+                snackbarHostState.showSnackbar(state.message)
+                viewModel.resetImportExportState()
+            }
+            is ImportExportState.Error -> {
+                snackbarHostState.showSnackbar(state.message)
+                viewModel.resetImportExportState()
+            }
+            else -> {}
+        }
+    }
+
+    if (showImportConfirmationDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showImportConfirmationDialog = false
+                pendingImportUri = null
+            },
+            title = { Text(stringResource(R.string.import_dialog_title)) },
+            text = { Text(stringResource(R.string.import_dialog_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        pendingImportUri?.let { viewModel.importData(it) }
+                        showImportConfirmationDialog = false
+                        pendingImportUri = null
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.action_continue),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showImportConfirmationDialog = false
+                        pendingImportUri = null
+                    }
+                ) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+
+    var showMenu by remember { mutableStateOf(false) }
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.app_name)) },
+                actions = {
+                    IconButton(onClick = { showMenu = !showMenu }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_export_data)) },
+                            onClick = {
+                                showMenu = false
+                                exportLauncher.launch("backup_${System.currentTimeMillis()}.json")
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.menu_import_data)) },
+                            onClick = {
+                                showMenu = false
+                                importLauncher.launch(arrayOf("application/json"))
+                            }
+                        )
+                    }
+                }
+            )
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddEntryClick) {
                 Icon(Icons.Default.Add, contentDescription = "Add Entry")
@@ -39,6 +151,10 @@ fun HomeScreen(
         contentWindowInsets = WindowInsets.systemBars
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+            if (importExportState is ImportExportState.Loading) {
+                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter))
+            }
+            
             when (val state = uiState) {
                 is HomeUiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))

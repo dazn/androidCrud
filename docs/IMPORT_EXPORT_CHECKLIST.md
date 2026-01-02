@@ -18,31 +18,46 @@ This checklist outlines the sequential steps to implement data backup (export) a
     - Update `EntryRepository` to expose `replaceAllEntries(newEntries: List<EntryEntity>)`.
 
 ## Phase 3: Backup/Restore Logic
-- [ ] **Create BackupRepository:**
+- [x] **Create BackupRepository:**
     - Implement `BackupRepository` to handle the business logic of import/export.
     - **Export:** Fetch all entries -> Construct `BackupData` with `BuildConfig.VERSION_NAME` -> Serialize to JSON -> Write to `OutputStream`.
     - **Import:** Read `InputStream` -> Deserialize JSON -> Validate Version -> Call `entryRepository.replaceAllEntries`.
-- [ ] **Hilt Injection:**
+- [x] **Hilt Injection:**
     - Update `Di` modules to provide `BackupRepository`.
 
 ## Phase 4: UI & ViewModel Integration
-- [ ] **HomeViewModel Updates:**
+- [x] **HomeViewModel Updates:**
     - Add `exportData(uri: Uri)` function.
     - Add `importData(uri: Uri)` function.
     - Add `ExportState` / `ImportState` (Idle, Loading, Success, Error) to `HomeUiState` or separate channel.
-- [ ] **Home Screen UI:**
+- [x] **Home Screen UI:**
     - Add a Top App Bar action menu (three dots) to `HomeScreen`.
     - Add "Export Data" and "Import Data" menu items.
     - Integrate `rememberLauncherForActivityResult`:
         - `CreateDocument` ("application/json") for Export.
         - `OpenDocument` ("application/json") for Import.
-- [ ] **User Feedback:**
+- [x] **User Feedback:**
     - Show `Snackbar` or `Toast` on success or error (specifically handling "Incompatible Version" errors).
 
-## Phase 5: Verification
-- [ ] **Unit Tests:**
+## Phase 5: Confirm Data Import
+- [x] **Confirmation Dialog:**
+    - Implement a confirmation dialog triggered after selecting a backup file for import.
+    - Message: "Restoration from backup file replaces all existing data. All existing data will be lost!"
+    - Options:
+        - **Cancel** (Gray): Dismisses the dialog and cancels the import process.
+        - **Continue** (Red): Proceed with the import using the selected backup file.
+- [x] **Logic Updates:**
+    - Update `HomeScreen` to temporarily hold the selected URI until confirmation.
+    - Call `viewModel.importData(uri)` only after "Continue" is clicked.
+
+## Phase 6: Verification
+- [x] **Unit Tests:**
     - Test `BackupRepository` logic (mocking Input/Output streams).
     - Verify version check throws exception for older major versions.
     - Verify JSON serialization matches expected format.
-- [ ] **Integration Tests:**
-    - Test the full flow: Create entries -> Export -> Delete entries -> Import -> Verify entries restored.
+- [ ] **UI & Integration Tests:**
+    - **Confirmation Dialog:** Verify that the confirmation dialog appears after selecting a file for import.
+    - **Cancel Action:** Verify that clicking "Cancel" in the confirmation dialog dismisses it and does NOT trigger the import.
+    - **Continue Action:** Verify that clicking "Continue" in the confirmation dialog dismisses it and triggers the import process.
+    - **Full E2E Flow:** Create entries -> Export to file -> Clear database -> Import from file -> Verify entries are restored.
+    - **Error Handling:** Verify appropriate snackbar messages are shown for version mismatch or corrupted files.

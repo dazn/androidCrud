@@ -7,14 +7,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class EntryRepository @Inject constructor(
+open class EntryRepository @Inject constructor(
     private val entryDao: EntryDao
 ) {
-    fun getAllEntries(): Flow<List<EntryEntity>> = entryDao.getAllEntries()
+    open fun getAllEntries(): Flow<List<EntryEntity>> = entryDao.getAllEntries()
 
-    suspend fun getEntryById(id: Long): EntryEntity? = entryDao.getEntryById(id)
+    open suspend fun getEntryById(id: Long): EntryEntity? = entryDao.getEntryById(id)
 
-    suspend fun insertEntry(entry: EntryEntity) {
+    open suspend fun insertEntry(entry: EntryEntity) {
         if (entry.entryValue > 0) {
             entryDao.insertEntry(entry)
         } else {
@@ -22,7 +22,7 @@ class EntryRepository @Inject constructor(
         }
     }
 
-    suspend fun updateEntry(entry: EntryEntity) {
+    open suspend fun updateEntry(entry: EntryEntity) {
         if (entry.entryValue > 0) {
             entryDao.updateEntry(entry)
         } else {
@@ -30,11 +30,11 @@ class EntryRepository @Inject constructor(
         }
     }
 
-    suspend fun deleteEntry(entry: EntryEntity) {
+    open suspend fun deleteEntry(entry: EntryEntity) {
         entryDao.deleteEntry(entry)
     }
 
-    suspend fun replaceAllEntries(entries: List<EntryEntity>) {
+    open suspend fun replaceAllEntries(entries: List<EntryEntity>) {
         entryDao.replaceAll(entries)
     }
 }

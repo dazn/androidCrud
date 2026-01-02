@@ -15,19 +15,24 @@ import org.junit.Rule
 import org.junit.Test
 import java.time.Instant
 
+import com.example.androidcrud.data.repository.BackupRepository
+import android.content.Context
+
 class HomeViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
     private val repository = mockk<EntryRepository>()
+    private val backupRepository = mockk<BackupRepository>(relaxed = true)
+    private val context = mockk<Context>(relaxed = true)
 
     @Test
     fun uiState_emitsSuccess_whenRepositoryReturnsData() = runTest {
         val testEntry = EntryEntity(id = 1, timestamp = Instant.now(), entryValue = 10)
         coEvery { repository.getAllEntries() } returns flowOf(listOf(testEntry))
 
-        val viewModel = HomeViewModel(repository)
+        val viewModel = HomeViewModel(repository, backupRepository, context)
 
         viewModel.uiState.test {
             // First emission might be Loading or Success depending on how fast the flow is
@@ -47,7 +52,7 @@ class HomeViewModelTest {
     fun uiState_emitsEmpty_whenRepositoryReturnsEmptyList() = runTest {
         coEvery { repository.getAllEntries() } returns flowOf(emptyList())
 
-        val viewModel = HomeViewModel(repository)
+        val viewModel = HomeViewModel(repository, backupRepository, context)
 
         viewModel.uiState.test {
             val item1 = awaitItem()
@@ -64,7 +69,7 @@ class HomeViewModelTest {
     fun deleteEntry_callsRepositoryDelete() = runTest {
         // Setup flow to keep VM happy
         coEvery { repository.getAllEntries() } returns flowOf(emptyList())
-        val viewModel = HomeViewModel(repository)
+        val viewModel = HomeViewModel(repository, backupRepository, context)
 
         val testEntry = EntryEntity(id = 1, timestamp = Instant.now(), entryValue = 10)
         coEvery { repository.deleteEntry(testEntry) } returns Unit

@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Android Crud</string>
+    <string name="menu_export_data">Export Data</string>
+    <string name="menu_import_data">Import Data</string>
+    <string name="msg_export_success">Export successful</string>
+    <string name="msg_import_success">Import successful</string>
+    <string name="msg_export_error">Export failed: %s</string>
+    <string name="msg_import_error">Import failed: %s</string>
+    <string name="msg_incompatible_version">Incompatible version</string>
+    <string name="import_dialog_title">Confirm Import</string>
+    <string name="import_dialog_message">Restoration from backup file replaces all existing data. All existing data will be lost!</string>
+    <string name="action_continue">Continue</string>
+    <string name="action_cancel">Cancel</string>
 </resources>
