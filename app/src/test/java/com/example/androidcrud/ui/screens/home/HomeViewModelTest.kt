@@ -4,9 +4,7 @@ import app.cash.turbine.test
 import com.example.androidcrud.MainDispatcherRule
 import com.example.androidcrud.data.local.EntryEntity
 import com.example.androidcrud.data.repository.EntryRepository
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -14,7 +12,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import java.time.Instant
-
 import com.example.androidcrud.data.repository.BackupRepository
 import android.content.Context
 
@@ -77,5 +74,60 @@ class HomeViewModelTest {
         viewModel.deleteEntry(testEntry)
 
         coVerify { repository.deleteEntry(testEntry) }
+    }
+
+    @Test
+    fun importData_success() = runTest {
+        coEvery { repository.getAllEntries() } returns flowOf(emptyList())
+        val contentResolver = mockk<android.content.ContentResolver>()
+        every { context.contentResolver } returns contentResolver
+        
+        val uri = mockk<android.net.Uri>()
+        val inputStream = java.io.ByteArrayInputStream("{}".toByteArray())
+        every { contentResolver.openInputStream(uri) } returns inputStream
+        
+        coEvery { backupRepository.importData(any()) } returns Unit
+        
+        val viewModel = HomeViewModel(repository, backupRepository, context)
+        
+        viewModel.importData(uri)
+        
+        viewModel.importExportState.test {
+            val item = awaitItem()
+            if (item is ImportExportState.Loading) {
+                 assertEquals(ImportExportState.Success("Import successful"), awaitItem())
+            } else {
+                 assertEquals(ImportExportState.Success("Import successful"), item)
+            }
+        }
+    }
+
+    @Test
+    fun importData_error() = runTest {
+        coEvery { repository.getAllEntries() } returns flowOf(emptyList())
+        val contentResolver = mockk<android.content.ContentResolver>()
+        every { context.contentResolver } returns contentResolver
+        
+        val uri = mockk<android.net.Uri>()
+        val inputStream = java.io.ByteArrayInputStream("{}".toByteArray())
+        every { contentResolver.openInputStream(uri) } returns inputStream
+        
+        coEvery { backupRepository.importData(any()) } throws RuntimeException("Version Mismatch")
+        
+        val viewModel = HomeViewModel(repository, backupRepository, context)
+        
+        viewModel.importData(uri)
+        
+        viewModel.importExportState.test {
+            val item = awaitItem()
+            if (item is ImportExportState.Loading) {
+                 val errorItem = awaitItem()
+                 assertTrue(errorItem is ImportExportState.Error)
+                 assertEquals("Version Mismatch", (errorItem as ImportExportState.Error).message)
+            } else {
+                 assertTrue(item is ImportExportState.Error)
+                 assertEquals("Version Mismatch", (item as ImportExportState.Error).message)
+            }
+        }
     }
 }

@@ -41,4 +41,14 @@ class E2ETest {
         // Verify we are back on Home and item exists
         composeTestRule.onNodeWithText("Value: 999").assertIsDisplayed()
     }
+
+    @Test
+    fun importExportMenu_isAccessible() {
+        // Open Menu
+        composeTestRule.onNodeWithContentDescription("More options").performClick()
+
+        // Verify options exist
+        composeTestRule.onNodeWithText("Export Data").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Import Data").assertIsDisplayed()
+    }
 }

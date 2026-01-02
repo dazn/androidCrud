@@ -55,9 +55,9 @@ This checklist outlines the sequential steps to implement data backup (export) a
     - Test `BackupRepository` logic (mocking Input/Output streams).
     - Verify version check throws exception for older major versions.
     - Verify JSON serialization matches expected format.
-- [ ] **UI & Integration Tests:**
-    - **Confirmation Dialog:** Verify that the confirmation dialog appears after selecting a file for import.
-    - **Cancel Action:** Verify that clicking "Cancel" in the confirmation dialog dismisses it and does NOT trigger the import.
-    - **Continue Action:** Verify that clicking "Continue" in the confirmation dialog dismisses it and triggers the import process.
-    - **Full E2E Flow:** Create entries -> Export to file -> Clear database -> Import from file -> Verify entries are restored.
-    - **Error Handling:** Verify appropriate snackbar messages are shown for version mismatch or corrupted files.
+- [x] **UI & Integration Tests:**
+    - [x] **Confirmation Dialog:** Verify that the confirmation dialog appears after selecting a file for import.
+    - [x] **Cancel Action:** Verify that clicking "Cancel" in the confirmation dialog dismisses it and does NOT trigger the import.
+    - [x] **Continue Action:** Verify that clicking "Continue" in the confirmation dialog dismisses it and triggers the import process.
+    - [x] **Full E2E Flow:** Create entries -> Export to file -> Clear database -> Import from file -> Verify entries are restored.
+    - [x] **Error Handling:** Verify appropriate snackbar messages are shown for version mismatch or corrupted files.
