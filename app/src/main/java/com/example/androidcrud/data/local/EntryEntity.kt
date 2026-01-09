@@ -12,5 +12,6 @@ data class EntryEntity(
     val id: Long = 0,
     @Serializable(with = InstantSerializer::class)
     val timestamp: Instant,
-    val entryValue: Int
+    val entryValue: Int,
+    val note: String? = null
 )
