@@ -94,10 +94,10 @@ Implementation checklist for adding an optional `note` text field to entries in 
 ## Section 3: Home Screen List Display
 
 ### EntryItem Composable
-- [ ] Update `EntryItem` to conditionally display note in supporting content
+- [x] Update `EntryItem` to conditionally display note in supporting content
   - **File**: `app/src/main/java/com/example/androidcrud/ui/screens/home/HomeScreen.kt`
   - **Line**: Update `EntryItem` composable at lines 296-328
-  - **Status**: ❌ Not started
+  - **Status**: ✅ Completed
   - **Requirements**:
     - Wrap supporting content in `Column`
     - Show note only if `entry.note?.isNotBlank() == true`
