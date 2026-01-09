@@ -31,10 +31,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.androidcrud.R
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -92,6 +94,16 @@ fun AddEntryScreen(
                         Text("Value must be a positive integer", color = MaterialTheme.colorScheme.error)
                     }
                 },
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = uiState.noteInput,
+                onValueChange = viewModel::updateNote,
+                label = { Text(stringResource(R.string.label_note)) },
+                modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
 

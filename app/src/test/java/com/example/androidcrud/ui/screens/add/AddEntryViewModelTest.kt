@@ -96,4 +96,63 @@ class AddEntryViewModelTest {
         assertTrue(viewModel.uiState.value.isEntrySaved)
         coVerify { repository.updateEntry(match { it.id == 123L && it.entryValue == 100 }) }
     }
+
+    @Test
+    fun updateNote_updatesState() {
+        val savedStateHandle = SavedStateHandle(mapOf("entryId" to null))
+        val viewModel = AddEntryViewModel(savedStateHandle, repository)
+
+        viewModel.updateNote("My Note")
+        assertEquals("My Note", viewModel.uiState.value.noteInput)
+    }
+
+    @Test
+    fun saveEntry_includesNote_whenNewEntry() = runTest {
+        val savedStateHandle = SavedStateHandle(mapOf("entryId" to null))
+        val viewModel = AddEntryViewModel(savedStateHandle, repository)
+
+        viewModel.updateEntryValue("42")
+        viewModel.updateNote("Test Note")
+        viewModel.saveEntry()
+
+        coVerify { repository.insertEntry(match { it.note == "Test Note" }) }
+    }
+
+    @Test
+    fun saveEntry_convertsBlankNoteToNull() = runTest {
+        val savedStateHandle = SavedStateHandle(mapOf("entryId" to null))
+        val viewModel = AddEntryViewModel(savedStateHandle, repository)
+
+        viewModel.updateEntryValue("42")
+        viewModel.updateNote("   ") // Blank note
+        viewModel.saveEntry()
+
+        coVerify { repository.insertEntry(match { it.note == null }) }
+    }
+
+    @Test
+    fun init_restoresNote_whenEditingExistingEntry() = runTest {
+        val timestamp = Instant.now()
+        val existingEntry = EntryEntity(id = 123L, timestamp = timestamp, entryValue = 99, note = "Existing Note")
+        
+        coEvery { repository.getEntryById(123L) } returns existingEntry
+        
+        val savedStateHandle = SavedStateHandle(mapOf("entryId" to 123L))
+        val viewModel = AddEntryViewModel(savedStateHandle, repository)
+
+        assertEquals("Existing Note", viewModel.uiState.value.noteInput)
+    }
+
+    @Test
+    fun init_restoresNullNoteAsEmptyString_whenEditingExistingEntry() = runTest {
+        val timestamp = Instant.now()
+        val existingEntry = EntryEntity(id = 123L, timestamp = timestamp, entryValue = 99, note = null)
+        
+        coEvery { repository.getEntryById(123L) } returns existingEntry
+        
+        val savedStateHandle = SavedStateHandle(mapOf("entryId" to 123L))
+        val viewModel = AddEntryViewModel(savedStateHandle, repository)
+
+        assertEquals("", viewModel.uiState.value.noteInput)
+    }
 }

@@ -21,7 +21,8 @@ data class AddEntryUiState(
     val selectedTimestamp: Instant = Instant.now(),
     val entryValueInt: Int? = null,
     val entryValueError: Boolean = false,
-    val isEntrySaved: Boolean = false
+    val isEntrySaved: Boolean = false,
+    val noteInput: String = ""
 )
 
 @HiltViewModel
@@ -34,7 +35,8 @@ class AddEntryViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(AddEntryUiState(
         entryValueInput = savedStateHandle["entryValueInput"] ?: "",
-        selectedTimestamp = savedStateHandle["selectedTimestamp"] ?: Instant.now()
+        selectedTimestamp = savedStateHandle["selectedTimestamp"] ?: Instant.now(),
+        noteInput = savedStateHandle["noteInput"] ?: ""
     ))
     val uiState: StateFlow<AddEntryUiState> = _uiState.asStateFlow()
 
@@ -45,11 +47,13 @@ class AddEntryViewModel @Inject constructor(
                 entry?.let {
                     savedStateHandle["entryValueInput"] = it.entryValue.toString()
                     savedStateHandle["selectedTimestamp"] = it.timestamp
+                    savedStateHandle["noteInput"] = it.note ?: ""
                     _uiState.update { currentState ->
                         currentState.copy(
                             entryValueInput = it.entryValue.toString(),
                             selectedTimestamp = it.timestamp,
-                            entryValueInt = it.entryValue
+                            entryValueInt = it.entryValue,
+                            noteInput = it.note ?: ""
                         )
                     }
                 }
@@ -75,6 +79,11 @@ class AddEntryViewModel @Inject constructor(
         _uiState.update { it.copy(selectedTimestamp = timestamp) }
     }
 
+    fun updateNote(input: String) {
+        savedStateHandle["noteInput"] = input
+        _uiState.update { it.copy(noteInput = input) }
+    }
+
     fun saveEntry() {
         val currentState = _uiState.value
         val value = currentState.entryValueInt
@@ -85,7 +94,8 @@ class AddEntryViewModel @Inject constructor(
                     val entry = EntryEntity(
                         id = entryId ?: 0L,
                         timestamp = currentState.selectedTimestamp,
-                        entryValue = value
+                        entryValue = value,
+                        note = currentState.noteInput.ifBlank { null }
                     )
                     
                     if (entryId != null) {

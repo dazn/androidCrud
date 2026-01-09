@@ -1,7 +1,7 @@
 .worktrees/
 .aider*
-app/build*
-build*
+app/build/
+build/
 
 # Gradle files
 .gradle/

@@ -14,4 +14,5 @@
     <string name="delete_dialog_title">Confirm Deletion</string>
     <string name="delete_dialog_message">Are you sure you want to delete the entry from %s?</string>
     <string name="action_delete">Delete</string>
+    <string name="label_note">Note</string>
 </resources>
