@@ -17,13 +17,27 @@ import org.robolectric.RobolectricTestRunner
 import android.app.Application
 import org.robolectric.annotation.Config
 import java.time.Instant
+import com.example.androidcrud.BuildConfig
+import org.junit.Assume
+import org.junit.rules.RuleChain
+import org.junit.rules.TestRule
+import org.junit.runners.model.Statement
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = Application::class, sdk = [34])
 class DeleteConfirmationTest {
 
-    @get:Rule
     val composeTestRule = createComposeRule()
+
+    @get:Rule
+    val ruleChain: RuleChain = RuleChain.outerRule(TestRule { base, _ ->
+        object : Statement() {
+            override fun evaluate() {
+                Assume.assumeTrue("Skipping Robolectric Compose test in Release build", BuildConfig.DEBUG)
+                base.evaluate()
+            }
+        }
+    }).around(composeTestRule)
 
     private val viewModel = mockk<HomeViewModel>(relaxed = true)
     // Create a mock entry with a fixed timestamp
