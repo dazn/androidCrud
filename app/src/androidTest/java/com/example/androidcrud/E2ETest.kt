@@ -39,7 +39,7 @@ class E2ETest {
         composeTestRule.onNodeWithText("Save Entry").performClick()
 
         // Verify we are back on Home and item exists
-        composeTestRule.onNodeWithText("Value: 999").assertIsDisplayed()
+        composeTestRule.onNodeWithText("999").assertIsDisplayed()
     }
 
     @Test

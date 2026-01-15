@@ -305,7 +305,7 @@ fun EntryItem(
     }
 
     ListItem(
-        headlineContent = { Text(text = "Value: ${entry.entryValue}") },
+        headlineContent = { Text(text = entry.entryValue.toString()) },
         supportingContent = {
             Column {
                 // Show note only if non-blank
