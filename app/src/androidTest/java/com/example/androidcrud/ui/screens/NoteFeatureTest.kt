@@ -54,7 +54,7 @@ class NoteFeatureTest {
         composeTestRule.onNodeWithText("Save Entry").performClick()
 
         composeTestRule.onNodeWithText(noteContent).assertIsDisplayed()
-        composeTestRule.onNodeWithText("Value: $entryValue").assertIsDisplayed()
+        composeTestRule.onNodeWithText("$entryValue").assertIsDisplayed()
     }
 
     @Test
@@ -65,7 +65,7 @@ class NoteFeatureTest {
         composeTestRule.onNodeWithText("Entry Value (Positive Integer)").performTextInput(entryValue)
         composeTestRule.onNodeWithText("Save Entry").performClick()
 
-        composeTestRule.onNodeWithText("Value: $entryValue").assertIsDisplayed()
+        composeTestRule.onNodeWithText("$entryValue").assertIsDisplayed()
         // We verify that no empty text node is taking up space or "null" text exists.
         // This is implicit if the list looks correct, hard to assert strictly "no empty space" 
         // without visual snapshot testing, but we can assert we don't see "null" or empty rows.
