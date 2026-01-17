@@ -125,6 +125,7 @@ fun HomeScreen(
 
         AlertDialog(
             onDismissRequest = {
+                viewModel.cancelDeletion(entry)
                 showDeleteConfirmationDialog = false
                 entryToDelete = null
             },
@@ -133,7 +134,7 @@ fun HomeScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        viewModel.deleteEntry(entry)
+                        viewModel.confirmDeletion(entry)
                         showDeleteConfirmationDialog = false
                         entryToDelete = null
                     }
@@ -147,6 +148,7 @@ fun HomeScreen(
             dismissButton = {
                 TextButton(
                     onClick = {
+                        viewModel.cancelDeletion(entry)
                         showDeleteConfirmationDialog = false
                         entryToDelete = null
                     }
@@ -223,6 +225,7 @@ fun HomeScreen(
                     EntryList(
                         entries = state.entries,
                         onDelete = { entry ->
+                            viewModel.markForDeletion(entry)
                             entryToDelete = entry
                             showDeleteConfirmationDialog = true
                         },

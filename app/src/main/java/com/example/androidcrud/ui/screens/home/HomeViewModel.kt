@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -40,14 +41,19 @@ class HomeViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    val uiState: StateFlow<HomeUiState> = repository.getAllEntries()
-        .map { entries ->
-            if (entries.isEmpty()) {
-                HomeUiState.Empty
-            } else {
-                HomeUiState.Success(entries)
-            }
+    private val _pendingDeletes = MutableStateFlow<Set<Long>>(emptySet())
+
+    val uiState: StateFlow<HomeUiState> = combine(
+        repository.getAllEntries(),
+        _pendingDeletes
+    ) { entries, pendingIds ->
+        val filteredEntries = entries.filter { it.id !in pendingIds }
+        if (filteredEntries.isEmpty()) {
+            HomeUiState.Empty
+        } else {
+            HomeUiState.Success(filteredEntries)
         }
+    }
         .catch { emit(HomeUiState.Error(it.message ?: "Unknown error")) }
         .stateIn(
             scope = viewModelScope,
@@ -57,6 +63,24 @@ class HomeViewModel @Inject constructor(
 
     private val _importExportState = MutableStateFlow<ImportExportState>(ImportExportState.Idle)
     val importExportState = _importExportState.asStateFlow()
+
+    fun markForDeletion(entry: EntryEntity) {
+        _pendingDeletes.value += entry.id
+    }
+
+    fun cancelDeletion(entry: EntryEntity) {
+        _pendingDeletes.value -= entry.id
+    }
+
+    fun confirmDeletion(entry: EntryEntity) {
+        viewModelScope.launch {
+            try {
+                repository.deleteEntry(entry)
+            } finally {
+                _pendingDeletes.value -= entry.id
+            }
+        }
+    }
 
     fun deleteEntry(entry: EntryEntity) {
         viewModelScope.launch {

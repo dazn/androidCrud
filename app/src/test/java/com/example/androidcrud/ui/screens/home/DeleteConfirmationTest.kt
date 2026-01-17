@@ -23,6 +23,10 @@ import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
 import org.junit.runners.model.Statement
 
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeLeft
+
 @RunWith(RobolectricTestRunner::class)
 @Config(application = Application::class, sdk = [34])
 class DeleteConfirmationTest {
@@ -62,7 +66,10 @@ class DeleteConfirmationTest {
 
         // Click Delete Icon on the list item
         composeTestRule.onNodeWithContentDescription("Delete Entry").performClick()
-        
+
+        // Verify markForDeletion was called
+        verify(exactly = 1) { viewModel.markForDeletion(testEntry) }
+
         // Dialog should appear
         composeTestRule.onNodeWithText("Confirm Deletion").assertIsDisplayed()
         
@@ -73,8 +80,8 @@ class DeleteConfirmationTest {
         // Dialog should be gone
         composeTestRule.onNodeWithText("Confirm Deletion").assertDoesNotExist()
         
-        // Verify deleteEntry was NOT called
-        verify(exactly = 0) { viewModel.deleteEntry(any()) }
+        // Verify cancelDeletion WAS called
+        verify(exactly = 1) { viewModel.cancelDeletion(testEntry) }
     }
 
     @Test
@@ -97,10 +104,46 @@ class DeleteConfirmationTest {
         composeTestRule.onNodeWithText("Delete").performClick()
         composeTestRule.waitForIdle()
         
-        // Verify deleteEntry WAS called
-        verify(exactly = 1) { viewModel.deleteEntry(testEntry) }
+        // Verify confirmDeletion WAS called
+        verify(exactly = 1) { viewModel.confirmDeletion(testEntry) }
         
         // Dialog should be gone
         composeTestRule.onNodeWithText("Confirm Deletion").assertDoesNotExist()
+    }
+
+    @Test
+    fun swipeToDelete_showsConfirmationDialog_and_cancels_resetsSwipe() {
+        every { viewModel.uiState } returns uiStateFlow
+        every { viewModel.importExportState } returns importExportStateFlow
+
+        composeTestRule.setContent {
+            HomeScreen(
+                onAddEntryClick = {},
+                onEditEntryClick = {},
+                viewModel = viewModel
+            )
+        }
+
+        // Perform swipe left on the item
+        composeTestRule.onNodeWithText("123").performTouchInput {
+            swipeLeft()
+        }
+        composeTestRule.waitForIdle()
+
+        // Verify markForDeletion was called
+        verify { viewModel.markForDeletion(testEntry) }
+
+        // Dialog should appear
+        composeTestRule.onNodeWithText("Confirm Deletion").assertIsDisplayed()
+
+        // Click Cancel
+        composeTestRule.onNodeWithText("Cancel").performClick()
+        composeTestRule.waitForIdle()
+
+        // Dialog should be gone
+        composeTestRule.onNodeWithText("Confirm Deletion").assertDoesNotExist()
+
+        // Verify cancelDeletion WAS called
+        verify { viewModel.cancelDeletion(testEntry) }
     }
 }
